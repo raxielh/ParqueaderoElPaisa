@@ -21,4 +21,18 @@ Route::get('/register', function () {
     return redirect('/login');
 });
 
-Route::get('/home', 'HomeController@index');
+Route::get('/home', 'HomeController@index')->name('home');
+
+Route::post('/parqueo', 'HomeController@parqueo')->name('parqueo');
+
+Route::get('/lugares/{tipo_vehiculo}', 'HomeController@puestos')->name('lugares');
+
+Route::resource('tarifatipoveiculos', 'TarifatipoveiculoController');
+
+Route::resource('tipovehiculos', 'TipovehiculoController');
+
+Route::resource('estadopuestos', 'EstadopuestoController');
+
+Route::resource('puestos', 'PuestoController');
+
+Route::resource('puestos', 'PuestoController');

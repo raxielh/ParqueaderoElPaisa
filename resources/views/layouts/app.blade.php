@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>CarWash-Soft</title>
+    <title>{{ env('APP_NAME') }}</title>
     <meta content='width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no' name='viewport'>
     <meta name="csrf-token" content="{{ csrf_token() }}" />
     <link rel="apple-touch-icon" sizes="57x57" href="{{URL::asset('favicon/apple-icon-57x57.png')}}">
@@ -100,8 +100,8 @@
         <header class="main-header oc">
 
             <a href="#" class="logo" style="text-decoration: none;">
-                <span class="logo-mini"><b>C</b>Soft</span>
-                <span class="logo-lg"><b>CarWash</b>Soft</span>
+                <span class="logo-mini"><b>P</b>p</span>
+                <span class="logo-lg">{{ env('APP_NAME') }}</span>
             </a>
 
             <!-- Header Navbar -->
@@ -163,7 +163,7 @@
 
         <!-- Main Footer -->
         <footer class="main-footer oc" style="max-height: 100px;text-align: center">
-            <strong>Copyright © <a href="#">CarWash-Soft</a>.</strong> All rights reserved.
+            <strong>Copyright © <a href="#">{{ env('APP_NAME') }}</a>.</strong> All rights reserved.
         </footer>
 
     </div>
@@ -183,7 +183,7 @@
 
                 <!-- Branding Image -->
                 <a class="navbar-brand" href="{!! url('/') !!}">
-                    CarWash-Soft
+                    {{ env('APP_NAME') }}
                 </a>
             </div>
 
@@ -234,29 +234,6 @@
                 $( "body" ).removeClass("sidebar-open");
             }
             
-        }
-
-        $(document).ready( function () {
-            $('.table').DataTable({
-                "ordering": false,
-                "responsive": true
-            });
-            $('.date').datepicker({format: "yyyy-mm-dd"}); 
-            $('.tree-toggle').click(function () {
-                $(this).parent().children('ul.tree').toggle(200);
-            });
-        } );
-        
-        var config = {
-          '.chosen-select'           : {},
-          '.chosen-select-deselect'  : { allow_single_deselect: true },
-          '.chosen-select-no-single' : { disable_search_threshold: 10 },
-          '.chosen-select-no-results': { no_results_text: 'Oops, nothing found!' },
-          '.chosen-select-rtl'       : { rtl: true },
-          '.chosen-select-width'     : { width: '95%' }
-        }
-        for (var selector in config) {
-          $(selector).chosen(config[selector]);
         }
     </script>
     @yield('scripts')

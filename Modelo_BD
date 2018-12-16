@@ -7,6 +7,58 @@ Configuracion
 	concepto_lavador_gasto integer:unsigned:foreign,conceptos,id select
 		required
 
+php artisan infyom:scaffold Tarifatipoveiculo
+
+	descripciontarifa char,100 text
+		required
+	numminutosinicio integer number
+		required
+	valorinicio float text
+		required
+	numminutosfraccion integer number
+		required
+	valorfraccion float text
+		required
+
+php artisan infyom:scaffold Tipovehiculo
+
+	desctipovehiculo char,100 text
+		required
+	idtarifatipoveiculo integer:unsigned:foreign,tarifatipoveiculos,id select
+		required
+
+
+php artisan infyom:scaffold Estadopuesto
+
+	descestadopuesto char,100 text
+		required
+
+
+php artisan infyom:scaffold Puesto
+
+	idestado integer:unsigned:foreign,estadopuestos,id select
+		required
+	idtipovehiculo integer:unsigned:foreign,tipovehiculos,id select
+		required
+	numero integer number
+		required
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 *Roles

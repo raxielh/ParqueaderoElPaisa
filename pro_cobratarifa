@@ -1,0 +1,122 @@
+CREATE OR REPLACE FUNCTION public.pro_cobratarifa(p_idpuesto integer, OUT idmesnaje character varying, OUT mensaje character varying, OUT tipo character varying, OUT mensajeuser character varying, OUT v_valorpagar numeric, OUT v_idfactura integer, OUT v_minutos integer)
+ RETURNS record
+ LANGUAGE plpgsql
+AS $function$
+DECLARE
+
+  s_minutos INTEGER := 0;
+  s_numminutosinicio INTEGER := 0;
+  s_valorinicio numeric := 0;
+  s_numminutosfraccion INTEGER := 0;
+  s_valorfraccion numeric := 0;
+
+  s_valorpagar numeric := 0;
+  s_calculafraccion INTEGER := 0;
+  s_calculaninfraccion INTEGER := 0;
+
+  s_idpuesto integer;
+  s_placavehiculo varchar;
+
+  s_idparqueo integer := 0;
+  s_idtarifatipoveiculo integer := 0;
+s_idfactura integer :=0;
+s_idtipovehiculo integer:=1;
+BEGIN
+
+  begin
+  
+                
+        mensajeuser  = 'Factura aceptada con exito';
+        mensaje   =  'Factura aceptada con exito ('||now()||')';
+        idmesnaje ='0';
+        tipo='alert-info';
+  
+    SELECT max(p.id)
+    into strict s_idparqueo
+    from parqueos p,
+         puestos pu
+    where p.idpuesto = p_idpuesto and
+          p.valorpagar = 0 and
+          p.idpuesto = pu.id and
+          pu.idestado = 2;
+
+    if (s_idparqueo is not null) then
+    
+      update parqueos
+      set salida = now()
+      where id = s_idparqueo;
+      
+      SELECT  pu.idtipovehiculo,
+             tv.idtarifatipoveiculo,
+             p.placavehiculo,
+               round((
+             (extract(day from p.salida - p.entrada)*1440)+
+             extract(hour from p.salida - p.entrada) * 60) +
+             (extract(minute from p.salida - p.entrada)) +
+              round(extract(second from p.salida - p.entrada) / 60)) minutos,
+           tav.numminutosinicio,
+           tav.valorinicio,
+           tav.numminutosfraccion,
+           tav.valorfraccion
+      into strict s_idtipovehiculo,
+           s_idtarifatipoveiculo,
+           s_placavehiculo,
+           s_minutos,
+           s_numminutosinicio,
+           s_valorinicio,
+           s_numminutosfraccion,
+           s_valorfraccion
+      FROM parqueos p,
+           puestos pu,
+           tipovehiculos tv,
+           tarifatipoveiculos tav
+      where p.id = s_idparqueo and
+            p.idpuesto = pu.id and
+            pu.idtipovehiculo = tv.id and
+            tv.idtarifatipoveiculo = tav.id;
+
+      s_valorpagar=s_valorinicio;
+
+      if (s_minutos > s_numminutosinicio  ) then
+        s_calculafraccion=s_minutos-s_numminutosinicio;
+        s_calculaninfraccion=ceiling((s_calculafraccion)::numeric/
+          s_numminutosfraccion::numeric);
+        s_valorpagar=s_valorpagar+(s_calculaninfraccion*s_valorfraccion);
+      end if;
+      update parqueos
+      set valorpagar = s_valorpagar
+      where id = s_idparqueo;
+      
+      update puestos
+      set idestado = 1
+      where id = p_idpuesto;
+      
+     select nextval('factura1_id_seq'::regclass)
+     into strict s_idfactura ;
+      
+      INSERT INTO public.facturas(id,placa, fecha, valortotal, idparqueo,numerohoras, idtarifatipoveiculo,idtipovehiculo)
+      VALUES (s_idfactura,s_placavehiculo, now(), s_valorpagar, s_idparqueo, s_minutos,s_idtarifatipoveiculo,s_idtipovehiculo);
+
+    v_valorpagar =s_valorpagar;
+    v_idfactura =s_idfactura;
+    v_minutos =s_minutos;
+
+
+    end if;
+    
+    
+    
+    
+
+    EXCEPTION WHEN  others THEN
+    
+        mensajeuser  = public.fun_nombreconstein(SQLERRM);
+        mensaje =   'Error,  '||public.fun_nombreconstein(SQLERRM)||'.('||now()||')';
+        idmesnaje ='0';
+        tipo='alert-danger';
+    
+ 
+
+  end;
+END;
+$function$

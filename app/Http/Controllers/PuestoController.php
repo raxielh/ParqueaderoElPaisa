@@ -40,6 +40,7 @@ class PuestoController extends AppBaseController
         ->join('estadopuestos', 'puestos.idestado', '=', 'estadopuestos.id')
         ->join('tipovehiculos', 'puestos.idtipovehiculo', '=', 'tipovehiculos.id')
         ->select('puestos.*','estadopuestos.descestadopuesto','tipovehiculos.desctipovehiculo')
+        ->orderBy('puestos.numero', 'asc')
         ->get();
         return view('puestos.index')
             ->with('puestos', $puestos);

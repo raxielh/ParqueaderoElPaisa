@@ -83,7 +83,7 @@
             </div>
             <script>
                 $(function() {
-                    var url='/buscar_placa/{{$puesto->id}}';
+                    var url='{{ env('APP_URL') }}/buscar_placa/{{$puesto->id}}';
                     $.getJSON(url, function( json ) {
                         $.each( json, function( key, val ) {
                             $('#placa-{{$puesto->id}}').val($.trim(val.placavehiculo));

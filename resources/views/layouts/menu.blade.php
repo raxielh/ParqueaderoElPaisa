@@ -1,5 +1,5 @@
 <li class="{{ Request::is('home*') ? 'active' : '' }}{{ Request::is('cobrar*') ? 'active' : '' }}{{ Request::is('lugares*') ? 'active' : '' }}">
-    <a href="/home" style="font-size:18px"><i class="fa fa-home"></i><span> Inicio</span></a>
+    <a href="{!! route('home') !!}" style="font-size:18px"><i class="fa fa-home"></i><span> Inicio</span></a>
 </li>
 
 <li class="{{ Request::is('tarifatipoveiculos*') ? 'active' : '' }}">

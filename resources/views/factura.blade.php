@@ -72,7 +72,7 @@
   
 <div class="row">
     <div class="col-md-12" style="padding:2em;">
-        <a href="/home" class="btn btn-info"><i class="fa fa-chevron-circle-left" aria-hidden="true"></i> Atras</a>
+        <a href="{{ env('APP_URL') }}/home" class="btn btn-info"><i class="fa fa-chevron-circle-left" aria-hidden="true"></i> Atras</a>
         <a href="#" onclick="window.print();" class="btn btn-xl btn-warning"><i class="fa fa-print" aria-hidden="true"></i> Imprimir</a>
         @foreach ($fs as $f)
         <div class="ticket">

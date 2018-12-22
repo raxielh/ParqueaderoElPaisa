@@ -37,7 +37,15 @@ class HomeController extends Controller
         ->where('idtipovehiculo',$id)
         ->orderBy('numero', 'asc')
         ->get();
-        return view('puestos')->with('puestos', $puestos);
+
+        $pp = DB::table('parqueos')
+        ->join('puestos', 'parqueos.idpuesto', '=', 'puestos.id')
+        ->where('puestos.idtipovehiculo',$id)
+        ->select('puestos.*','parqueos.*')
+        ->get();
+
+
+        return view('puestos')->with('puestos', $puestos)->with('pp', $pp);
     
     }
 
@@ -64,6 +72,46 @@ class HomeController extends Controller
         $puesto->save();
 
     	return redirect(route('home'));
+    
+    }
+
+    public function buscar_placa($id)
+    {
+        return DB::table('parqueos')
+        ->where('idpuesto',$id)
+        ->select('placavehiculo')
+        ->get();
+    
+    }
+
+    public function cobrar(request $request)
+    {
+        $x=DB::select('SELECT * FROM pro_cobratarifa('.$request->puesto.')');
+
+        $fs= DB::table('facturas')
+        ->where('id',$x[0]->v_idfactura)
+        ->get();
+
+        return view('factura')->with('fs', $fs);
+
+    
+    }
+
+    public function informe()
+    {
+        $datos=0;
+        return view('informe')->with('datos', $datos);
+
+    
+    }
+
+    public function r_informe(request $request)
+    {
+        $datos=DB::select("SELECT to_date(to_char(f.fecha,'DD/MM/YYYY'),'DD/MM/YYYY') FECHAS,tv.desctipovehiculo,sum(f.valortotal) valortotal FROM public.facturas f,tipovehiculos tv
+        where  f.idestado=1 and f.idtipovehiculo=tv.id and to_date(to_char(f.fecha,'DD/MM/YYYY'),'DD/MM/YYYY') between '".$request->fi."' and '".$request->ff."' group by to_date(to_char(f.fecha,'DD/MM/YYYY'),'DD/MM/YYYY'),tv.desctipovehiculo order by to_date(to_char(f.fecha,'DD/MM/YYYY'),'DD/MM/YYYY');");
+
+
+        return view('r_informe')->with('datos', $datos);
     
     }
 

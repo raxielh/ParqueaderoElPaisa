@@ -22,11 +22,7 @@
     <![endif]-->
     <style>
         html{
-            background: url({{URL::asset('img/bg.jpg')}}) no-repeat center center fixed; 
-              -webkit-background-size: cover;
-              -moz-background-size: cover;
-              -o-background-size: cover;
-              background-size: cover;
+            background-color: #bd9409;
         }
         .login-page, .register-page {
             background: rgba(210, 214, 222, 0);
@@ -42,7 +38,7 @@
 <body class="hold-transition login-page">
 <div class="login-box">
     <div class="login-logo">
-        <a href="{{ url('/home') }}"><b>CarWash </b>Soft</a>
+        <a href="{{ url('/home') }}">     {{ env('APP_NAME') }}</a>
     </div>
 
     <!-- /.login-logo -->

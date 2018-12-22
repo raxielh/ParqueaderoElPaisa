@@ -60,23 +60,35 @@
         <div class="modal fade" id="m-{{$puesto->id}}" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true" style="z-index:999999">
                 <div class="modal-dialog" style="z-index:999999">
                     <div class="modal-content">
-                        <div class="modal-body" style="min-height: 100px;">
+                        <div class="modal-body" style="min-height: 150px;">
                             <div class="form-group col-sm-12 col-xs-12" style="margin-top:10px">
-                                <div class="col-md-6 col-sm-6 col-xs-6 text-center">
-                                    {!! Form::open(['route' => 'parqueo']) !!}
-                                        {!! Form::submit('Cobrar', ['class' => 'btn btn-success btn-lg']) !!}
+                                <div class="col-md-12 col-sm-12 col-xs-12 text-center">
+                                    {!! Form::open(['route' => 'cobrar']) !!}
+
+
+                                <input type="text" name="placa" value="" id="placa-{{$puesto->id}}" class="form-control" placeholder="Placa Vehiculo"><br>
+
+                                <input type="hidden" value="{{$puesto->id}}" name="puesto">
+
+                                    {!! Form::submit('Cobrar', ['class' => 'btn btn-success btn-lg']) !!}
+
                                     {!! Form::close() !!}
                                 </div>
-                                <div class="col-md-6 col-sm-6 col-xs-6 text-center">
-                                    {!! Form::open(['route' => 'parqueo']) !!}
-                                        {!! Form::submit('Imprimir', ['class' => 'btn btn-warning btn-lg']) !!}
-                                    {!! Form::close() !!}   
-                                </div>  
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
+            <script>
+                $(function() {
+                    var url='/buscar_placa/{{$puesto->id}}';
+                    $.getJSON(url, function( json ) {
+                        $.each( json, function( key, val ) {
+                            $('#placa-{{$puesto->id}}').val($.trim(val.placavehiculo))
+                        }); 
+                    });
+                });
+            </script>
         @endif
 
 

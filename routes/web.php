@@ -25,7 +25,14 @@ Route::get('/home', 'HomeController@index')->name('home');
 
 Route::post('/parqueo', 'HomeController@parqueo')->name('parqueo');
 
+Route::post('/cobrar', 'HomeController@cobrar')->name('cobrar');
+
 Route::get('/lugares/{tipo_vehiculo}', 'HomeController@puestos')->name('lugares');
+
+Route::get('informe/', 'HomeController@informe')->name('informe.index');
+Route::post('/r_informe', 'HomeController@r_informe')->name('r_informe');
+
+Route::get('/buscar_placa/{puesto}', 'HomeController@buscar_placa')->name('buscar_placa');
 
 Route::resource('tarifatipoveiculos', 'TarifatipoveiculoController');
 

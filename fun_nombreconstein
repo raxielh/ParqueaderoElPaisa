@@ -1,0 +1,68 @@
+CREATE OR REPLACE FUNCTION public.fun_nombreconstein(nom_constrin character varying)
+ RETURNS character varying
+ LANGUAGE plpgsql
+AS $function$
+declare
+  tempo varchar;
+  salida varchar;
+  posuno integer;
+  posdos integer;
+  postres integer;  
+  temp_nom_constrin1 varchar;
+  temp_nom_constrin2 varchar;
+begin
+temp_nom_constrin1:=nom_constrin;
+ tempo:='-1';
+select   position('«' in nom_constrin) into posuno;
+if (posuno>1) then
+      select substring(temp_nom_constrin1 from position('«' in temp_nom_constrin1)+1 for length(temp_nom_constrin1)) into temp_nom_constrin2;
+      temp_nom_constrin1:=temp_nom_constrin2;
+      select   position('«' in temp_nom_constrin2) into postres;
+      if (postres > 0) then
+          posuno=postres;
+          select substring(temp_nom_constrin1 from position('«' in temp_nom_constrin1)+1 for length(temp_nom_constrin1)) into temp_nom_constrin2;        
+          temp_nom_constrin1:=temp_nom_constrin2;
+      end if;
+     select     position('»' in temp_nom_constrin1)    into posdos;  
+     if (posdos>0) then          
+      tempo=substring(temp_nom_constrin1 from 1 for posdos-1);
+     end if;                
+end if;
+
+salida:=tempo;
+/*
+  if (posuno>0) then
+     select     position('»' in nom_constrin)    into posdos;
+  if (posdos>0) then
+  posdos := posdos-posuno;          
+           tempo=substring(nom_constrin from posuno+1 for posdos-1);
+   else
+           tempo:='-1';                     
+    end if;     
+       else  
+       tempo:='-1';   
+  end if; 
+  */ 
+ 
+ begin
+   SELECT er.err_mensaje INTO STRICT salida 
+   FROM public.g_erroresdb er
+    where er.err_constrein=tempo;    
+EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+   salida:=nom_constrin;
+     --  RAISE EXCEPTION 'NUM:%, DETAILS:%', SQLSTATE, SQLERRM;   
+      
+ end;  
+      
+   return salida;
+    
+   -- return '1'||tempo;
+/*
+  statements;
+exception
+when exception_name then
+  statements;
+  */
+end;
+$function$

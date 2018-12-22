@@ -39,6 +39,7 @@
                             <div class="form-group col-sm-12 col-xs-12">
                                 {!! Form::label('placa', 'Placa:') !!}
                                 {!! Form::text('placa', null, ['class' => 'form-control','placeholder' => 'IUQ 824']) !!}
+
                             </div>
                             <input type="hidden" value="{{$puesto->id}}" name="puesto">
 
@@ -69,6 +70,7 @@
                                 <input type="text" name="placa" value="" id="placa-{{$puesto->id}}" class="form-control" placeholder="Placa Vehiculo"><br>
 
                                 <input type="hidden" value="{{$puesto->id}}" name="puesto">
+                                <input type="hidden" value="" name="parqueo" id="parqueo-{{$puesto->id}}">
 
                                     {!! Form::submit('Cobrar', ['class' => 'btn btn-success btn-lg']) !!}
 
@@ -84,7 +86,8 @@
                     var url='/buscar_placa/{{$puesto->id}}';
                     $.getJSON(url, function( json ) {
                         $.each( json, function( key, val ) {
-                            $('#placa-{{$puesto->id}}').val($.trim(val.placavehiculo))
+                            $('#placa-{{$puesto->id}}').val($.trim(val.placavehiculo));
+                            $('#parqueo-{{$puesto->id}}').val($.trim(val.id));
                         }); 
                     });
                 });

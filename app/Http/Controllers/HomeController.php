@@ -79,14 +79,18 @@ class HomeController extends Controller
     {
         return DB::table('parqueos')
         ->where('idpuesto',$id)
-        ->select('placavehiculo')
+        ->select('placavehiculo','id')
         ->get();
     
     }
 
     public function cobrar(request $request)
     {
+
+        DB::select("UPDATE parqueos SET placavehiculo = '".$request->placa."' WHERE id=$request->parqueo");
+
         $x=DB::select('SELECT * FROM pro_cobratarifa('.$request->puesto.')');
+        
 
         $fs= DB::table('facturas')
         ->where('id',$x[0]->v_idfactura)
@@ -107,11 +111,18 @@ class HomeController extends Controller
 
     public function r_informe(request $request)
     {
-        $datos=DB::select("SELECT to_date(to_char(f.fecha,'DD/MM/YYYY'),'DD/MM/YYYY') FECHAS,tv.desctipovehiculo,sum(f.valortotal) valortotal FROM public.facturas f,tipovehiculos tv
-        where  f.idestado=1 and f.idtipovehiculo=tv.id and to_date(to_char(f.fecha,'DD/MM/YYYY'),'DD/MM/YYYY') between '".$request->fi."' and '".$request->ff."' group by to_date(to_char(f.fecha,'DD/MM/YYYY'),'DD/MM/YYYY'),tv.desctipovehiculo order by to_date(to_char(f.fecha,'DD/MM/YYYY'),'DD/MM/YYYY');");
 
+        $sql="SELECT to_date(to_char(f.fecha,'DD/MM/YYYY'),'DD/MM/YYYY') FECHAS,tv.desctipovehiculo,sum(f.valortotal) valortotal FROM public.facturas f,tipovehiculos tv
+        where  f.idestado=1 and f.idtipovehiculo=tv.id and to_date(to_char(f.fecha,'DD/MM/YYYY'),'DD/MM/YYYY') between '".$request->fi."' and '".$request->ff."' group by to_date(to_char(f.fecha,'DD/MM/YYYY'),'DD/MM/YYYY'),tv.desctipovehiculo order by to_date(to_char(f.fecha,'DD/MM/YYYY'),'DD/MM/YYYY');";
 
-        return view('r_informe')->with('datos', $datos);
+        $datos=DB::select($sql);
+
+        $sql2="SELECT f.fecha,f.id,f.idestado,f.idparqueo,f.idtarifatipoveiculo,f.idtipovehiculo,
+        tv.desctipovehiculo,f.numerohoras,f.placa,f.valortotal FROM   facturas f,tipovehiculos tv  WHERE  f.idestado = 1 AND f.idtipovehiculo = tv.id AND To_date(To_char(f.fecha, 'DD/MM/YYYY'),'DD/MM/YYYY') between '".$request->fi."' and '".$request->ff."' ORDER  BY To_date(To_char(f.fecha, 'DD/MM/YYYY'), 'DD/MM/YYYY');";
+
+        $datos2=DB::select($sql2);
+
+        return view('r_informe')->with('datos', $datos)->with('datos2', $datos2);
     
     }
 

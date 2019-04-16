@@ -111,14 +111,16 @@ class PuestoController extends AppBaseController
     public function edit($id)
     {
         $puesto = $this->puestoRepository->findWithoutFail($id);
-
+        $Estadopuesto = Estadopuesto::all()->pluck('descestadopuesto','id');
+        $Tarifas = Tarifas::all()->pluck('descripcion','id');
+        $Tipovehiculo = Tipovehiculo::all()->pluck('desctipovehiculo','id');
         if (empty($puesto)) {
             Flash::error('Puesto not found');
 
             return redirect(route('puestos.index'));
         }
 
-        return view('puestos.edit')->with('puesto', $puesto);
+        return view('puestos.edit')->with('puesto', $puesto)->with('Estadopuesto', $Estadopuesto)->with('Tarifas', $Tarifas)->with('Tipovehiculo', $Tipovehiculo);
     }
 
     /**

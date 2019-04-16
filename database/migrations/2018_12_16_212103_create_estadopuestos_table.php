@@ -16,8 +16,8 @@ class CreateEstadopuestosTable extends Migration
         Schema::create('estadopuestos', function (Blueprint $table) {
             $table->increments('id');
             $table->char('descestadopuesto', 100);
-            $table->timestamps();
             $table->softDeletes();
+            $table->timestamps();
         });
     }
 

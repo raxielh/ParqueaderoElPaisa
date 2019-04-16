@@ -3,7 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 
-class CreateTarifatipoveiculosTable extends Migration
+class CreateTarifasTable extends Migration
 {
 
     /**
@@ -13,13 +13,9 @@ class CreateTarifatipoveiculosTable extends Migration
      */
     public function up()
     {
-        Schema::create('tarifatipoveiculos', function (Blueprint $table) {
+        Schema::create('tarifas', function (Blueprint $table) {
             $table->increments('id');
-            $table->char('descripciontarifa', 100);
-            $table->integer('numminutosinicio');
-            $table->float('valorinicio');
-            $table->integer('numminutosfraccion');
-            $table->float('valorfraccion');
+            $table->char('descripcion', 100);
             $table->timestamps();
             $table->softDeletes();
         });
@@ -32,6 +28,6 @@ class CreateTarifatipoveiculosTable extends Migration
      */
     public function down()
     {
-        Schema::drop('tarifatipoveiculos');
+        Schema::drop('tarifas');
     }
 }

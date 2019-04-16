@@ -43,3 +43,9 @@ Route::resource('estadopuestos', 'EstadopuestoController');
 Route::resource('puestos', 'PuestoController');
 
 Route::resource('puestos', 'PuestoController');
+
+Route::resource('tarifas', 'TarifasController');
+
+Route::resource('tarifas', 'TarifasController');
+
+Route::resource('detalleTarifas', 'DetalleTarifaController');

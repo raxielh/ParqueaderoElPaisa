@@ -16,10 +16,8 @@ class CreateTipovehiculosTable extends Migration
         Schema::create('tipovehiculos', function (Blueprint $table) {
             $table->increments('id');
             $table->char('desctipovehiculo', 100);
-            $table->integer('idtarifatipoveiculo')->unsigned();
-            $table->timestamps();
             $table->softDeletes();
-            $table->foreign('idtarifatipoveiculo')->references('id')->on('tarifatipoveiculos');
+            $table->timestamps();
         });
     }
 

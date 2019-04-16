@@ -18,10 +18,12 @@ class CreatePuestosTable extends Migration
             $table->integer('idestado')->unsigned();
             $table->integer('idtipovehiculo')->unsigned();
             $table->integer('numero');
+            $table->integer('tarifas_id');
             $table->timestamps();
             $table->softDeletes();
             $table->foreign('idestado')->references('id')->on('estadopuestos');
             $table->foreign('idtipovehiculo')->references('id')->on('tipovehiculos');
+            $table->foreign('tarifas_id')->references('id')->on('tarifas');
         });
     }
 

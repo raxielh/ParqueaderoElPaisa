@@ -15,7 +15,6 @@ class CreateDetalleTarifasTable extends Migration
     {
         Schema::create('detalle_tarifas', function (Blueprint $table) {
             $table->increments('id');
-            $table->char('descripcion', 100);
             $table->integer('minutosinicio');
             $table->integer('minutosfinal');
             $table->float('valor');

@@ -25,7 +25,6 @@ class Tipovehiculo extends Model
 
     public $fillable = [
         'desctipovehiculo',
-        'idtarifatipoveiculo'
     ];
 
     /**
@@ -35,7 +34,6 @@ class Tipovehiculo extends Model
      */
     protected $casts = [
         'desctipovehiculo' => 'string',
-        'idtarifatipoveiculo' => 'integer'
     ];
 
     /**
@@ -45,7 +43,6 @@ class Tipovehiculo extends Model
      */
     public static $rules = [
         'desctipovehiculo' => 'required',
-        'idtarifatipoveiculo' => 'required'
     ];
 
     

@@ -14,7 +14,10 @@
                    {!! Form::model($detalleTarifa, ['route' => ['detalleTarifas.update', $detalleTarifa->id], 'method' => 'patch']) !!}
 
                         @include('detalle_tarifas.fields')
-
+                        <div class="form-group col-sm-6" style="margin-top:1.8em">
+    {!! Form::submit('Guardar', ['class' => 'btn btn-primary']) !!}
+    <a href="{!! route('tarifas.show',$tarifas->id) !!}" class="btn btn-default">Cancelar</a>
+</div>
                    {!! Form::close() !!}
                </div>
            </div>

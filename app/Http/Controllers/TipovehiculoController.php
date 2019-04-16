@@ -35,8 +35,6 @@ class TipovehiculoController extends AppBaseController
         $tipovehiculos = $this->tipovehiculoRepository->all();
 
         $tipovehiculos = DB::table('tipovehiculos')
-        ->join('tarifatipoveiculos', 'tipovehiculos.idtarifatipoveiculo', '=', 'tarifatipoveiculos.id')
-        ->select('tipovehiculos.*','tarifatipoveiculos.descripciontarifa')
         ->get();
 
         return view('tipovehiculos.index')
@@ -50,8 +48,7 @@ class TipovehiculoController extends AppBaseController
      */
     public function create()
     {
-        $Tarifatipoveiculo = Tarifatipoveiculo::all()->pluck('descripciontarifa','id');
-        return view('tipovehiculos.create')->with('Tarifatipoveiculo', $Tarifatipoveiculo);
+        return view('tipovehiculos.create');
     }
 
     /**
@@ -109,8 +106,7 @@ class TipovehiculoController extends AppBaseController
             return redirect(route('tipovehiculos.index'));
         }
 
-        $Tarifatipoveiculo = Tarifatipoveiculo::all()->pluck('descripciontarifa','id');
-        return view('tipovehiculos.edit')->with('tipovehiculo', $tipovehiculo)->with('Tarifatipoveiculo', $Tarifatipoveiculo);
+        return view('tipovehiculos.edit')->with('tipovehiculo', $tipovehiculo);
     }
 
     /**

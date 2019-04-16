@@ -65,7 +65,7 @@ class DetalleTarifaController extends AppBaseController
         Flash::success('Detalle Tarifa saved successfully.');
 
         //return redirect(route('detalleTarifas.index'));
-        return back()->withInput();
+        return back();
     }
 
     /**
@@ -98,6 +98,7 @@ class DetalleTarifaController extends AppBaseController
     public function edit($id)
     {
         $detalleTarifa = $this->detalleTarifaRepository->findWithoutFail($id);
+        $tarifas = DB::table('tarifas')->where('id',$id)->get();
 
         if (empty($detalleTarifa)) {
             Flash::error('Detalle Tarifa not found');
@@ -105,7 +106,7 @@ class DetalleTarifaController extends AppBaseController
             return redirect(route('detalleTarifas.index'));
         }
 
-        return view('detalle_tarifas.edit')->with('detalleTarifa', $detalleTarifa);
+        return view('detalle_tarifas.edit')->with('detalleTarifa', $detalleTarifa)->with('tarifas', $tarifas[0]);
     }
 
     /**
@@ -143,15 +144,8 @@ class DetalleTarifaController extends AppBaseController
      */
     public function destroy($id)
     {
-        $detalleTarifa = $this->detalleTarifaRepository->findWithoutFail($id);
-
-        if (empty($detalleTarifa)) {
-            Flash::error('Detalle Tarifa not found');
-
-            return redirect(route('detalleTarifas.index'));
-        }
-
-        $this->detalleTarifaRepository->delete($id);
+        DB::table('detalle_tarifas')->where('id',$id)
+        ->delete();
 
         Flash::success('Detalle Tarifa deleted successfully.');
 

@@ -21,8 +21,4 @@
 <li class="{{ Request::is('informe*') ? 'active' : '' }}{{ Request::is('r_informe*') ? 'active' : '' }}">
         <a href="{!! route('informe.index') !!}"><i class="fa fa-edit"></i><span>Informe</span></a>
     </li>
-    
-<li class="{{ Request::is('detalleTarifas*') ? 'active' : '' }}">
-    <a href="{!! route('detalleTarifas.index') !!}"><i class="fa fa-edit"></i><span>Detalle Tarifas</span></a>
-</li>
 

@@ -27,7 +27,8 @@ class Puesto extends Model
     public $fillable = [
         'idestado',
         'idtipovehiculo',
-        'numero'
+        'numero',
+        'tarifas_id'
     ];
 
     /**
@@ -38,7 +39,8 @@ class Puesto extends Model
     protected $casts = [
         'idestado' => 'integer',
         'idtipovehiculo' => 'integer',
-        'numero' => 'integer'
+        'numero' => 'integer',
+        'tarifas_id' => 'integer'
     ];
 
     /**
@@ -49,7 +51,8 @@ class Puesto extends Model
     public static $rules = [
         'idestado' => 'required',
         'idtipovehiculo' => 'required',
-        'numero' => 'required'
+        'numero' => 'required',
+        'tarifas_id' => 'required'
     ];
 
     

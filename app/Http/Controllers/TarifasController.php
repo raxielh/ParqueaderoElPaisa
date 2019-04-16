@@ -78,7 +78,7 @@ class TarifasController extends AppBaseController
     {
         $tarifas = $this->tarifasRepository->findWithoutFail($id);
 
-        $detalleTarifas = DB::table('detalle_tarifas')->get();
+        $detalleTarifas = DB::table('detalle_tarifas')->where('tarifas_id',$id)->get();
 
         if (empty($tarifas)) {
             Flash::error('Tarifas not found');

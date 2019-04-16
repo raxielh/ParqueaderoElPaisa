@@ -16,6 +16,12 @@
     {!! Form::number('numero', null, ['class' => 'form-control']) !!}
 </div>
 
+<!-- Idtipovehiculo Field -->
+<div class="form-group col-sm-6">
+    {!! Form::label('tarifas_id', 'Tarifa:') !!}
+    {!! Form::select('tarifas_id',$Tarifas, null, ['class' => 'form-control']) !!}
+</div>
+
 <!-- Submit Field -->
 <div class="form-group col-sm-12">
     {!! Form::submit('Save', ['class' => 'btn btn-primary']) !!}

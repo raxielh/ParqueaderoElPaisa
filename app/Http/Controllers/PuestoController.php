@@ -12,6 +12,7 @@ use Prettus\Repository\Criteria\RequestCriteria;
 use Response;
 use App\Models\Estadopuesto;
 use App\Models\Tipovehiculo;
+use App\Models\Tarifas;
 use Illuminate\Support\Facades\DB;
 
 
@@ -55,8 +56,10 @@ class PuestoController extends AppBaseController
     {
         $Estadopuesto = Estadopuesto::all()->pluck('descestadopuesto','id');
         $Tipovehiculo = Tipovehiculo::all()->pluck('desctipovehiculo','id');
+        $Tarifas = Tarifas::all()->pluck('descripcion','id');
         return view('puestos.create')
         ->with('Estadopuesto', $Estadopuesto)
+        ->with('Tarifas', $Tarifas)
         ->with('Tipovehiculo', $Tipovehiculo);
     }
 

@@ -2,7 +2,6 @@
     <thead>
         <tr>
             <th>Tipo Vehiculo</th>
-        <th>Tarifa</th>
             <th colspan="3">Action</th>
         </tr>
     </thead>
@@ -10,7 +9,6 @@
     @foreach($tipovehiculos as $tipovehiculo)
         <tr>
             <td>{!! $tipovehiculo->desctipovehiculo !!}</td>
-            <td>{!! $tipovehiculo->descripciontarifa !!}</td>
             <td>
                 {!! Form::open(['route' => ['tipovehiculos.destroy', $tipovehiculo->id], 'method' => 'delete']) !!}
                 <div class='btn-group'>

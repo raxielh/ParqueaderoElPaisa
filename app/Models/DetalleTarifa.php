@@ -28,7 +28,6 @@ class DetalleTarifa extends Model
 
 
     public $fillable = [
-        'descripcion',
         'minutosinicio',
         'minutosfinal',
         'valor',
@@ -42,7 +41,6 @@ class DetalleTarifa extends Model
      * @var array
      */
     protected $casts = [
-        'descripcion' => 'string',
         'minutosinicio' => 'integer',
         'minutosfinal' => 'integer',
         'valor' => 'float',
@@ -56,7 +54,6 @@ class DetalleTarifa extends Model
      * @var array
      */
     public static $rules = [
-        'descripcion' => 'required',
         'minutosinicio' => 'required',
         'minutosfinal' => 'required',
         'valor' => 'required',

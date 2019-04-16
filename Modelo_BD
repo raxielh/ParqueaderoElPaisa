@@ -43,272 +43,276 @@ php artisan infyom:scaffold Puesto
 	numero integer number
 		required
 
+CREATE OR REPLACE FUNCTION public.pro_cobratarifa (
+  p_idpuesto integer,
+  out idmesnaje varchar,
+  out mensaje varchar,
+  out tipo varchar,
+  out mensajeuser varchar,
+  out v_valorpagar numeric,
+  out v_idfactura integer,
+  out v_minutos integer
+)
+RETURNS record AS
+$body$
+DECLARE
+
+  s_minutos INTEGER := 0;
+  s_numminutosinicio INTEGER := 0;
+  s_valorinicio numeric := 0;
+  s_numminutosfraccion INTEGER := 0;
+  s_valorfraccion numeric := 0;
+
+  s_valorpagar numeric := 0;
+  s_calculafraccion INTEGER := 0;
+  s_calculaninfraccion INTEGER := 0;
+
+  s_idpuesto integer;
+  s_placavehiculo varchar;
+
+  s_idparqueo integer := 0;
+  s_idtarifatipoveiculo integer := 0;
+s_idfactura integer :=0;
+s_idtipovehiculo integer:=1;
+
+s_id_tarifa integer :=0;
+BEGIN
+
+  begin
+  
+                
+        mensajeuser  = 'Factura aceptada con exito';
+        mensaje   =  'Factura aceptada con exito ('||now()||')';
+        idmesnaje ='0';
+        tipo='alert-info';
+  
+    SELECT max(p.id)
+    into strict s_idparqueo
+    from parqueos p,
+         puestos pu
+    where p.idpuesto = p_idpuesto and
+          p.valorpagar = 0 and
+          p.idpuesto = pu.id and
+          pu.idestado = 2;
+
+    if (s_idparqueo is not null) then
+    
+      update parqueos
+      set salida = now()
+      where id = s_idparqueo;
+     
+     SELECT  pu.idtipovehiculo,
+             p.placavehiculo,
+               round((
+             (extract(day from p.salida - p.entrada)*1440)+
+             extract(hour from p.salida - p.entrada) * 60) +
+             (extract(minute from p.salida - p.entrada)) +
+              round(extract(second from p.salida - p.entrada) / 60)) minutos,
+              ta.id  id_tarifa
+               into strict s_idtipovehiculo,
+           s_idtarifatipoveiculo,
+           s_placavehiculo,
+           s_minutos,
+           s_id_tarifa
+      FROM parqueos p,
+           puestos pu,
+           tipovehiculos tv,
+           tarifas ta
+      where p.id = s_idparqueo and
+            p.idpuesto = pu.id and
+            pu.idtipovehiculo = tv.id and
+            pu.tarifas_id=ta.id  ;
+            
+
+ 
+
+       select   max(dt.valor)
+        into strict s_valorpagar
+      FROM  public.detalle_tarifas dt
+      where dt.tarifas_id=s_id_tarifa
+      and s_minutos between dt.minutosinicio and dt.minutosfinal;
+      
+      
+      update parqueos
+      set valorpagar = s_valorpagar
+      where id = s_idparqueo;
+      
+      update puestos
+      set idestado = 1
+      where id = p_idpuesto;
+      
+     select nextval('factura1_id_seq'::regclass)
+     into strict s_idfactura ;
+      
+      INSERT INTO public.facturas(id,placa, fecha, valortotal, idparqueo,numerohoras, idtarifa,idtipovehiculo)
+      VALUES (s_idfactura,s_placavehiculo, now(), s_valorpagar, s_idparqueo, s_minutos,s_id_tarifa,s_idtipovehiculo);
+
+    v_valorpagar =s_valorpagar;
+    v_idfactura =s_idfactura;
+    v_minutos =s_minutos;
+
+
+    end if;
+    
+    
+    
+    
+
+    EXCEPTION WHEN  others THEN
+    
+        mensajeuser  = public.fun_nombreconstein(SQLERRM);
+        mensaje =   'Error,  '||public.fun_nombreconstein(SQLERRM)||'.('||now()||')';
+        idmesnaje ='0';
+        tipo='alert-danger';
+    
+ 
+
+  end;
+END;
+$body$
+LANGUAGE 'plpgsql'
+VOLATILE
+CALLED ON NULL INPUT
+SECURITY INVOKER
+PARALLEL UNSAFE
+COST 100;
+
+ALTER FUNCTION public.pro_cobratarifa (p_idpuesto integer, out idmesnaje varchar, out mensaje varchar, out tipo varchar, out mensajeuser varchar, out v_valorpagar numeric, out v_idfactura integer, out v_minutos integer)
+  OWNER TO postgres;
 
 
 
 
 
+CREATE TABLE public.estadofactura (
+  id INTEGER NOT NULL,
+  descestadofactura VARCHAR,
+  CONSTRAINT estadofactura_pkey PRIMARY KEY(id)
+) ;
+
+CREATE TABLE public.facturas (
+  id SERIAL,
+  placa VARCHAR,
+  fecha TIMESTAMP WITHOUT TIME ZONE DEFAULT now() NOT NULL,
+  valortotal NUMERIC,
+  idparqueo INTEGER,
+  numerohoras INTEGER,
+  idtarifa INTEGER NOT NULL,
+  idestado INTEGER DEFAULT 1 NOT NULL,
+  idtipovehiculo INTEGER DEFAULT 1 NOT NULL,
+  CONSTRAINT facturas_pkey PRIMARY KEY(id),
+  CONSTRAINT facturas_fk FOREIGN KEY (idparqueo)
+    REFERENCES public.parqueos(id)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
+    NOT DEFERRABLE,
+  CONSTRAINT facturas_fk1 FOREIGN KEY (idestado)
+    REFERENCES public.estadofactura(id)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
+    NOT DEFERRABLE,
+  CONSTRAINT facturas_fk2 FOREIGN KEY (idtipovehiculo)
+    REFERENCES public.tipovehiculos(id)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
+    NOT DEFERRABLE,
+  CONSTRAINT facturas_fk3 FOREIGN KEY (idtarifa)
+    REFERENCES public.tarifas(id)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
+    NOT DEFERRABLE
+) ;
+
+CREATE TABLE public.g_erroresdb
+(
+  err_constrein character varying(300) NOT NULL,
+  err_mensaje character varying,
+  CONSTRAINT g_erroresdb_pkey PRIMARY KEY (err_constrein)
+)
+
+
+CREATE OR REPLACE FUNCTION public.fun_nombreconstein (
+  nom_constrin varchar
+)
+RETURNS varchar AS
+$body$
+declare
+  tempo varchar;
+  salida varchar;
+  posuno integer;
+  posdos integer;
+  postres integer;  
+  temp_nom_constrin1 varchar;
+  temp_nom_constrin2 varchar;
+begin
+temp_nom_constrin1:=nom_constrin;
+ tempo:='-1';
+select   position('«' in nom_constrin) into posuno;
+if (posuno>1) then
+      select substring(temp_nom_constrin1 from position('«' in temp_nom_constrin1)+1 for length(temp_nom_constrin1)) into temp_nom_constrin2;
+      temp_nom_constrin1:=temp_nom_constrin2;
+      select   position('«' in temp_nom_constrin2) into postres;
+      if (postres > 0) then
+          posuno=postres;
+          select substring(temp_nom_constrin1 from position('«' in temp_nom_constrin1)+1 for length(temp_nom_constrin1)) into temp_nom_constrin2;        
+          temp_nom_constrin1:=temp_nom_constrin2;
+      end if;
+     select     position('»' in temp_nom_constrin1)    into posdos;  
+     if (posdos>0) then          
+      tempo=substring(temp_nom_constrin1 from 1 for posdos-1);
+     end if;                
+end if;
+
+salida:=tempo;
+/*
+  if (posuno>0) then
+     select     position('»' in nom_constrin)    into posdos;
+  if (posdos>0) then
+  posdos := posdos-posuno;          
+           tempo=substring(nom_constrin from posuno+1 for posdos-1);
+   else
+           tempo:='-1';                     
+    end if;     
+       else  
+       tempo:='-1';   
+  end if; 
+  */ 
+ 
+ begin
+   SELECT er.err_mensaje INTO STRICT salida 
+   FROM public.g_erroresdb er
+    where er.err_constrein=tempo;    
+EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+   salida:=nom_constrin;
+     --  RAISE EXCEPTION 'NUM:%, DETAILS:%', SQLSTATE, SQLERRM;   
+      
+ end;  
+      
+   return salida;
+    
+   -- return '1'||tempo;
+/*
+  statements;
+exception
+when exception_name then
+  statements;
+  */
+end;
+$body$
+LANGUAGE 'plpgsql'
+VOLATILE
+CALLED ON NULL INPUT
+SECURITY INVOKER
+PARALLEL UNSAFE
+COST 100;
+
+ALTER FUNCTION public.fun_nombreconstein (nom_constrin varchar)
+  OWNER TO postgres;
 
 
 
 
-
-
-
-
-
-
-
-
-
-*Roles
-	descripcion char,100 text
-		required
-	users_id integer:unsigned:foreign,users,id hidden
-
-*Permisos
-	modulo char,100 text
-	descripcion char,100 textarea
-	roles_id integer:unsigned:foreign,roles,id select
-	users_id integer:unsigned:foreign,users,id hidden
-
-
-*UsuariosRol
-	roles_id integer:unsigned:foreign,roles,id select
-		required
-	users_id integer:unsigned:foreign,users,id select
-		required
-
-*Estados
-	descripcion char,100 text
-		required
-	users_id integer:unsigned:foreign,users,id hidden
-
-*TipoConceptos
-	descripcion mediumText textarea
-		required
-	users_id integer:unsigned:foreign,users,id hidden
-
-*Conceptos
-	codigo char,100 text
-		required
-	descripcion mediumText textarea
-		required
-	tipo_conceptos_id integer:unsigned:foreign,tipo_conceptos,id select
-		required
-	estado_id integer:unsigned:foreign,estados,id select
-		required
-	users_id integer:unsigned:foreign,users,id hidden
-
-*ValoresConcepto
-	concepto_id integer:unsigned:foreign,conceptos,id select
-		required
-	valor integer number
-		required
-	users_id integer:unsigned:foreign,users,id hidden
-
-*Combos
-	concepto_id1 integer:unsigned:foreign,conceptos,id text
-		required
-	concepto_id2 integer:unsigned:foreign,conceptos,id select
-		required
-	estado_id integer:unsigned:foreign,estados,id select
-		required
-	users_id integer:unsigned:foreign,users,id hidden
-
-*TipoIdentificacion
-	descripcion mediumText textarea
-		required
-	users_id integer:unsigned:foreign,users,id hidden
-
-*Personas
-	nombre char,100 text
-		required
-	apellido char,100 text
-		required
-	tipo_identificacion_id integer:unsigned:foreign,tipo_identificacions,id select
-		required
-	identificacion char,100 text
-		required
-	fecha_nacimiento date date
-	direccion char,100 text
-	telefono2 char,100 number
-	telefono1 char,100 number
-	users_id integer:unsigned:foreign,users,id hidden
-
-*Vehiculos
-	persona_id integer:unsigned:foreign,personas,id select
-		required
-	placa char:unique,100 text
-		required
-	modelo char,100 number
-	color char,100 text
-	users_id integer:unsigned:foreign,users,id hidden
-
-*GaleriaVehiculos
-	vehiculo_id integer:unsigned:foreign,vehiculos,id select
-	foto char,199 text
-	users_id integer:unsigned:foreign,users,id hidden
-
-*Equipos
-	codigo char,100 text
-		required
-	descripcion char,100 text
-		required
-	users_id integer:unsigned:foreign,users,id hidden
-
-*EquipoPersonas
-	equipo_id integer:unsigned:foreign,equipos,id hidden
-	persona_id integer:unsigned:foreign,personas,id select
-		required
-	estado_id integer:unsigned:foreign,estados,id select
-		required
-	users_id integer:unsigned:foreign,users,id hidden
-
-** EstadoFactura
-	descripcion char,100 text
-	required
-	users_id integer:unsigned:foreign,users,id hidden
-
-** EstadoComanda
-	descripcion char,100 text
-	required
-	users_id integer:unsigned:foreign,users,id hidden
-
-
-	// caho
- ** Comanda
-	persona_id integer:unsigned:foreign,personas,id select
-	required
-	vehiculo_id integer:unsigned:foreign,vehiculos,id select
-	required
-	estado_id integer:unsigned:foreign,estado_comandas,id select
-	required
-	observacion char,100 text
-	users_id integer:unsigned:foreign,users,id hidden
-
-
-** ComandaDetalle
-	comanda_id integer:unsigned:foreign,comandas,id hidden
-	concepto_id integer:unsigned:foreign,conceptos,id select
-		required
-	descuentos_id integer:unsigned:foreign,descuentos,id select
-		required
-	valor char,100 text
-		required
-	users_id integer:unsigned:foreign,users,id hidden
-
-** Descuento
-	codigo char,100 text
-		required
-	descripcion char,100 text
-		required
-	porcentaje integer number
-	required
-	users_id integer:unsigned:foreign,users,id hidden
-
-
-//caho
-** Lavado
-	comanda_id integer:unsigned:foreign,comandas,id select
-	required
-	equipo_id integer:unsigned:foreign,equipos,id select
-	required
-	users_id integer:unsigned:foreign,users,id hidden
-
-faturacion
-	persona
-	vehiculo
-	estado
-	users_id integer:unsigned:foreign,users,id hidden
-
-faturacion_detalle
-	factura
-	concepto
-	descuento 
-	valor
-	users_id integer:unsigned:foreign,users,id hidden
-
-*** Proveedores
-	codigo char,100 text
-	required
-	persona_id integer:unsigned:foreign,personas,id select
-	required
-	razon_social char,100 text
-	required
-	nit char,100 text
-	required
-	direccion char,100 text
-	telefono2 char,100 text
-	telefono1 char,100 text
-	users_id integer:unsigned:foreign,users,id hidden
-
-*Marca
-	descripcion char,100 textarea
-		required
-	users_id integer:unsigned:foreign,users,id hidden
-
-*Linea
-	marca_id integer:unsigned:foreign,marcas,id select
-		required
-	descripcion char,100 textarea
-		required
-	users_id integer:unsigned:foreign,users,id hidden
-
-*Remision
-	descripcion char,100 textarea
-		required
-	persona_id integer:unsigned:foreign,personas,id select
-		required
-	proveedor_id integer:unsigned:foreign,proveedores,id select
-		required
-	concepto_id integer:unsigned:foreign,conceptos,id select
-		required
-	tipo_remision_id integer:unsigned:foreign,tipo_remision,id select
-		required
-	fecha date,100 text
-		required
-	valor integer number
-		required
-	users_id integer:unsigned:foreign,users,id hidden
-
-
-*Administrativo
-	persona_id integer:unsigned:foreign,personas,id select
-		required
-	comision integer number
-		required
-	estado_id integer:unsigned:foreign,estados,id select
-		required
-
-
-GananciaAdministrivo
-	valorini integer number
-		required
-	valorfin integer number
-		required
-	porcenganancia integer number
-		required
-
-
-
-
-*validar en personas la fecha nacimiento
-*agregar marca del vehiculo
-*linea del vehiculo
-reporte de equipo carros lavados
-*en la comanda colocar cantidad de conceptos
-diseño factura depende del modelo que envio diego
-*modelo de impresion de comanda que envia diego
-*porcentage de comision en los conceptos para los equipos
-diego va diseñar del informe final de egresos e ingresos
-
-*crear adminsitradores que ganarian comision con respecto a : el producido de los servicios no incluidas las bebidas y aliments
-
-*en el formulario de proveedor en el campo persona que salga el nombre en la busqueda
-en formulario concepto que se puedan agregar los valores
-
-*en los combobox de comcepto de todos los furmularios que salga el codigo y la descripcion
 
 
 

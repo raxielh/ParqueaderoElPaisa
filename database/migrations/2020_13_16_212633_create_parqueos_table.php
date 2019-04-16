@@ -19,7 +19,7 @@ class CreateParqueosTable extends Migration
             $table->char('placavehiculo',100)->nullable();
             $table->dateTime('entrada');
             $table->dateTime('salida')->nullable();
-            $table->integer('valorpagar')->nullable();
+            $table->integer('valorpagar')->default(0);
             $table->timestamps();
             $table->softDeletes();
             $table->foreign('idpuesto')->references('id')->on('puestos');

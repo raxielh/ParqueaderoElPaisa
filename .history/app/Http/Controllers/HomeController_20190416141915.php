@@ -115,9 +115,9 @@ class HomeController extends Controller
         $sql="SELECT to_date(to_char(f.fecha,'DD/MM/YYYY'),'DD/MM/YYYY') FECHAS,tv.desctipovehiculo,sum(f.valortotal) valortotal FROM public.facturas f,tipovehiculos tv
         where  f.idestado=1 and f.idtipovehiculo=tv.id and to_date(to_char(f.fecha,'DD/MM/YYYY'),'DD/MM/YYYY') between '".$request->fi."' and '".$request->ff."' group by to_date(to_char(f.fecha,'DD/MM/YYYY'),'DD/MM/YYYY'),tv.desctipovehiculo order by to_date(to_char(f.fecha,'DD/MM/YYYY'),'DD/MM/YYYY');";
 
-        $datos=DB::select($sql);  
+        $datos=DB::select($sql);
 
-        $sql2="SELECT f.fecha,f.id,f.idestado,f.idparqueo,f.idtarifa,f.idtipovehiculo,
+        $sql2="SELECT f.fecha,f.id,f.idestado,f.idparqueo,f.idtarifatipoveiculo,f.idtipovehiculo,
         tv.desctipovehiculo,f.numerohoras,f.placa,f.valortotal FROM   facturas f,tipovehiculos tv  WHERE  f.idestado = 1 AND f.idtipovehiculo = tv.id AND To_date(To_char(f.fecha, 'DD/MM/YYYY'),'DD/MM/YYYY') between '".$request->fi."' and '".$request->ff."' ORDER  BY To_date(To_char(f.fecha, 'DD/MM/YYYY'), 'DD/MM/YYYY');";
 
         $datos2=DB::select($sql2);
